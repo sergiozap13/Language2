@@ -49,9 +49,11 @@ int main(int argc, char* argv[]) {
     
     l.at(1) = bf;
     
-    cout << l.findBigram(b1);
+    //cout << l.findBigram(b1);
     
     l.sort();
+    
+    cout << l.toString();
     
     //cout << l.at(0).toString();
     

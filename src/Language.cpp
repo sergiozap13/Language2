@@ -16,6 +16,8 @@
 
 using namespace std;
 
+#include <iostream>
+
 const string Language::MAGIC_STRING_T="MP-LANGUAGE-T-1.0";
 
 Language::Language(){
@@ -77,7 +79,13 @@ int Language::findBigram(const Bigram &bigram) const{
 }
 
 std::string Language::toString() const {
-    
+    string result = to_string(this->_size);
+    result += "\n";
+    for(int i = 0; i < this->_size; i++){
+        result += _vectorBigramFreq[i].getBigram().getText() + " " + to_string(_vectorBigramFreq[i].getFrequency());
+        result += "\n";
+    }
+    return result;
 }
 
 void Language::sort(){
