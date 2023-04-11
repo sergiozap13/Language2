@@ -17,6 +17,7 @@
 using namespace std;
 
 #include <iostream>
+#include <fstream>
 
 const string Language::MAGIC_STRING_T="MP-LANGUAGE-T-1.0";
 
@@ -105,20 +106,84 @@ void Language::sort(){
    
 }
 
-void Language::save(char fileName[]){
+void Language::save(char fileName[]) const{
+    ofstream fo;
+    fo.open(fileName);
+    
+    string s(fileName);
+    if(!fo){
+        throw std::ios_base::failure("void Language::save(char fileName[]) const: the file (" + s + ")"
+                    + " can't be opened or an error occurs while writing to the file"); 
+    }
+    fo << MAGIC_STRING_T << endl;
+    
+    fo << this->_languageId << endl;
+    
+    fo << this->toString();
+    
+    fo.close();
     
 }
 
 void Language::load(char fileName[]){
+    ifstream fi;
+    fi.open(fileName);
     
+    string s(fileName);
+    if(!fi){
+        throw std::ios_base::failure("void Language::load(char fileName[]): the file (" + s + ")"
+                    + " can't be opened or an error occurs while reading to the file");
+    }
+    string magic_s = "";
+    string language = "";
+    int freq = 0;
+    fi >> magic_s;
+    
+    if(magic_s != MAGIC_STRING_T ){
+        throw std::invalid_argument("void Language::load(char fileName[]): an invalid magic string is found in: " + s);
+    }
+    fi >> language;
+    this->setLanguageId(language);
+    fi >> freq;
+    
+    if(freq > _size){
+        throw std::out_of_range("void Language::load(char fileName[]): the number of bigrams in the given file, cannot be allocated in this Language because it exceeds the maximum capacity");
+    }
+  
+    this->_size = freq;
+    string bigram_text_aux = "";
+    int freq_aux = 0;
+    
+    for(int i = 0; i < freq; i++){
+        fi >> bigram_text_aux;
+        fi >> freq_aux;
+        Bigram aux(bigram_text_aux);
+        BigramFreq bf_aux;
+        bf_aux.setBigram(aux);
+        bf_aux.setFrequency(freq_aux);
+        this->at(i) = bf_aux;
+    }
+    
+    fi.close();
 }
 
-void Language::append(BigramFreq bigramFreq){
-    
+void Language::append(const BigramFreq &bigramFreq){
+    int pos = findBigram(bigramFreq.getBigram());
+    if(pos != -1)
+        _vectorBigramFreq[pos].setFrequency(_vectorBigramFreq[pos].getFrequency() + bigramFreq.getFrequency());
+    else {
+        this->_size++;
+        if(this->_size == DIM_VECTOR_BIGRAM_FREQ )
+            throw std::out_of_range("void Language::append( BigramFreq &bigramFreq): the array is full, and no more elements can be appended to the array");
+        _vectorBigramFreq[this->_size -1].setBigram(bigramFreq.getBigram());
+        _vectorBigramFreq[this->_size -1].setFrequency(bigramFreq.getFrequency());
+    }
 }
 
-void Language::join(Language language){
-    
+void Language::join(const Language &language){
+    for (int i = 0; i < language.getSize(); i++){
+        append(language.at(i));
+    }
 }
 
 void Language::swapElements(int first, int second){
