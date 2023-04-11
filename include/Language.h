@@ -134,7 +134,7 @@ public:
      * if the given file cannot be opened or if an error occurs while writing
      * to the file
      */
-    void save(char fileName[]);
+    void save(char fileName[]) const;
 
     /**
      * @brief Loads into this object the Language object stored in the given 
@@ -167,7 +167,7 @@ public:
      * Modifier method
      * @param bigramFreq The BigramFreq to append to this object. Input parameter
      */
-    void append(BigramFreq bigramFreq);
+    void append( const BigramFreq &bigramFreq);
     
     /**
      * @brief Appends to this Language object, the list of pairs  
@@ -177,7 +177,7 @@ public:
      * Modifier method
      * @param language A Language object. Input parameter
      */
-    void join(Language language);
+    void join(const Language &language);
     
     /**
      * @brief ...
